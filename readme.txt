@@ -39,6 +39,10 @@ Our studies on our own sites have shown that for every 50 human spam comments a 
 
 == Changelog ==
 
+= 2.4.3 =
+
+* Bugfix - comments going into trash after 2.4.2 upgrade
+
 = 2.4.2 =
 
 * Bugfix - fix for PHP 7.2 deprecation warnings

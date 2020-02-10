@@ -4,12 +4,12 @@ Plugin Name: FV Antispam
 Plugin URI: http://foliovision.com/seo-tools/wordpress/plugins/fv-antispam
 Description: Powerful and simple antispam plugin. Puts all the spambot comments directly into trash and let's other plugins (Akismet) deal with the rest.
 Author: Foliovision
-Version: 2.4.2
+Version: 2.4.3
 Author URI: http://www.foliovision.com
 */
 
 
-$fv_antispam_ver = '2.4.2';
+$fv_antispam_ver = '2.4.3';
 $FV_Antispam_iFilledInCount = 0;
 $FV_Antispam_bMathJS = false;
 
@@ -1624,7 +1624,7 @@ function fvacq( form_name, form_id ) {
       //return;
     }
     global $post;
-    ob_start('FV_Antispam_Pro::func__fake_textarea');
+    ob_start('FV_Antispam::func__fake_textarea');
   }
   
   
@@ -1697,7 +1697,7 @@ function fvacq( form_name, form_id ) {
 
 
   static function func__fake_textarea( $input ) {
-    return preg_replace_callback("#wp-comments-post.php[^\"]*?\".*?(<textarea.*?name=['\"]comment['\"].*?</textarea>)#s", "FV_Antispam_Pro::func__replace_textarea" , $input);
+    return preg_replace_callback("#wp-comments-post.php[^\"]*?\".*?(<textarea.*?name=['\"]comment['\"].*?</textarea>)#s", "FV_Antispam::func__replace_textarea" , $input);
   }  
   
   
