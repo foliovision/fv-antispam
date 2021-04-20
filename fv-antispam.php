@@ -1697,7 +1697,7 @@ function fvacq( form_name, form_id ) {
 
 
   static function func__fake_textarea( $input ) {
-    return preg_replace_callback("#wp-comments-post.php[^\"]*?\".*?(<textarea.*?name=['\"]comment['\"].*?</textarea>)#s", "FV_Antispam::func__replace_textarea" , $input);
+    return preg_replace_callback("#<form[^>]*?wp-comments-post.php[^\"]*?\".*?(<textarea.*?name=['\"]comment['\"].*?</textarea>)#s", "FV_Antispam::func__replace_textarea" , $input);
   }  
   
   
