@@ -394,7 +394,7 @@ class FV_Antispam extends FV_Antispam_Plugin {
     );
     
     if( isset($_POST['question']) && isset($_POST['answer']) && count($_POST['question']) > 0 && count($_POST['answer']) > 0 ) {
-      $aQuestions = '';
+      $aQuestions = array();
       foreach( $_POST['question'] AS $key => $sQuestion ) {
         if( strlen( trim($sQuestion) ) > 0 ) {
           $aQuestions[] = stripslashes(trim($sQuestion)).','.stripslashes(trim($_POST['answer'][$key]));
