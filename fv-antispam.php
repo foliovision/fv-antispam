@@ -1578,17 +1578,17 @@ function fvacq( form_name, form_id ) {
       return;
     }
     $request_url = @$_SERVER['REQUEST_URI'];
-    $hidden_field = @$_POST['comment'];
-    $plugin_field = @$_POST[$this->func__protect($_POST['comment_post_ID'])];
+
     if (empty($_POST) || empty($request_url) || strpos($request_url, 'wp-comments-post.php') === false) {
       return;
     }
-    if (empty($hidden_field) && !empty($plugin_field)) {
-      $_POST['comment'] = $plugin_field;
+
+    if ( empty($_POST['comment']) && !empty($_POST[$this->func__protect($_POST['comment_post_ID'])])) {
+      $_POST['comment'] = $_POST[$this->func__protect($_POST['comment_post_ID'])];
       unset($_POST[$this->func__protect($_POST['comment_post_ID'])]);
     } else {
       $_POST['bee_spam'] = 1;
-	  add_filter( 'preprocess_comment', array($this, 'remove_akismet_hook' ),0);
+      add_filter( 'preprocess_comment', array($this, 'remove_akismet_hook'), 0);
     }
   }
   
