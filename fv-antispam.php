@@ -550,6 +550,8 @@ class FV_Antispam extends FV_Antispam_Plugin {
     }
     $comments = $wpdb->get_results("SELECT * FROM $wpdb->comments WHERE comment_id NOT IN ( select comment_id from $wpdb->commentmeta where meta_key = '_wp_trash_meta_time' ) AND comment_date_gmt < '$date' AND comment_approved = 'trash' ORDER BY comment_date_gmt ASC LIMIT 5000");
     if( count($comments) ) {      
+      $comments_imploded = '';
+
       $sWriteOut = 'FV Antispam Clean-up started at '.date('r')."\n--------\n";
       foreach($comments as $comment) {
         if( $bWriteOut ) {
@@ -1037,11 +1039,12 @@ function fvacq( form_name, form_id ) {
   
   
   function disp__login_form_js() {
+    $value = !empty($_POST[$this->func__ip_protect()]) ? $_POST[$this->func__ip_protect()] : '';
     ?>
 <script type="text/javascript">    
   jQuery(document).ready(function() {
 		jQuery( '#user_email').after(
-			jQuery("#user_email").clone().attr('id', '<?php echo $this->func__ip_protect(); ?>').attr('name', '<?php echo $this->func__ip_protect(); ?>').attr('value', '<?php echo $_POST[$this->func__ip_protect()]; ?>')
+			jQuery("#user_email").clone().attr('id', '<?php echo $this->func__ip_protect(); ?>').attr('name', '<?php echo $this->func__ip_protect(); ?>').attr('value', '<?php echo $value; ?>')
 		);
     jQuery("#user_email").hide();    
   })      
@@ -1077,7 +1080,7 @@ function fvacq( form_name, form_id ) {
       $sQuestion = strrev( $sQuestion );
 
       if( $sFormHTML && !$bFilledInSpecial ) {
-        $html = str_replace( '[fvquestion]', "<label class='fvacl' for='c_".$protect.$FV_Antispam_iFilledInCount."'>".$br.__($sQuestion)."</label>", $sFormHTML );
+        $html = str_replace( '[fvquestion]', "<label class='fvacl' for='c_".$protect.$FV_Antispam_iFilledInCount."'>".__($sQuestion)."</label>", $sFormHTML );
         $html = str_replace( '[fvanswer]', "<input class='fvacq' type='text' id='c_".$protect.$FV_Antispam_iFilledInCount."' name='c_".$protect."' size='5' /><input class='fvaca' type='hidden' name='ca_".$protect."' value='".$iRandom."' />", $html );
       } else {
         $br = false;
@@ -1105,7 +1108,7 @@ function fvacq( form_name, form_id ) {
 		$iA = rand(1,5);	
 		$iB = rand(1,5);
 			
-		$html .= "\n<span><label class='fval' for='m_".$protect.$FV_Antispam_iFilledInCount."'><br />".__('How much is')." $iA + $iB?</label></span> <input class='fvaq' type='text' id='m_".$protect.$FV_Antispam_iFilledInCount."' name='m_".$protect."' size='2' /><input class='fvaa' type='hidden' name='ma_".$protect."' value='".($iA+$iB)."' />\n";  
+		$html = "\n<span><label class='fval' for='m_".$protect.$FV_Antispam_iFilledInCount."'><br />".__('How much is')." $iA + $iB?</label></span> <input class='fvaq' type='text' id='m_".$protect.$FV_Antispam_iFilledInCount."' name='m_".$protect."' size='2' /><input class='fvaa' type='hidden' name='ma_".$protect."' value='".($iA+$iB)."' />\n";  
   	return $html;
   }
   
@@ -1284,7 +1287,7 @@ function fvacq( form_name, form_id ) {
   
   function func__faq_tastic_spam_check() {
     if (strpos($_SERVER['SCRIPT_NAME'], 'add-question.php') !== false) {      
-    	
+    	global $post;
     	$protect = FV_Antispam::func__protect($post->ID);
     	
     	if( isset($_POST['m_'.$protect]) && isset($_POST['ma_'.$protect]) && $_POST['m_'.$protect] == $_POST['ma_'.$protect] ) {	//	todo
@@ -1658,7 +1661,7 @@ function fvacq( form_name, form_id ) {
     preg_match( '/id=[\"\'](.*?)[\"\']/', $sTextarea, $id );
     preg_match( '/name=[\"\'](.*?)[\"\']/', $sTextarea, $name );
 
-    $sClass = $class[1];
+    $sClass = !empty($class) ? $class[1] : false;
     $sID = $id[1];
     $sName = $name[1];
 
@@ -2081,16 +2084,18 @@ if ( !function_exists('wp_notify_moderator') && ( $GLOBALS['FV_Antispam']->func_
   function wp_notify_moderator($comment_id) {
   	global $wpdb;
   
-  	if( get_option( "moderation_notify" ) == 0 )
-  		return true; 
+  	if( get_option( "moderation_notify" ) == 0 ) {
+  		return true;
+    }
+    
+    $comment = $wpdb->get_row("SELECT * FROM $wpdb->comments WHERE comment_ID='$comment_id' LIMIT 1");
   		
   	if( $comment->comment_type == 'pingback' || $comment->comment_type == 'trackback' ) {
   	  if( $GLOBALS['FV_Antispam']->func__get_plugin_option('disable_pingback_notify') ) {
 		    return true;
 		  }
   	}
-      
-  	$comment = $wpdb->get_row("SELECT * FROM $wpdb->comments WHERE comment_ID='$comment_id' LIMIT 1");
+
   	$post = $wpdb->get_row("SELECT * FROM $wpdb->posts WHERE ID='$comment->comment_post_ID' LIMIT 1");
   
   	$comment_author_domain = @gethostbyaddr($comment->comment_author_IP);
