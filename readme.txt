@@ -39,6 +39,11 @@ Our studies on our own sites have shown that for every 50 human spam comments a 
 
 == Changelog ==
 
+= 2.7 =
+
+* PHP 8.2 fixes
+* WordPress 6.1 fixes
+
 = 2.4.3 =
 
 * Bugfix - comments going into trash after 2.4.2 upgrade
