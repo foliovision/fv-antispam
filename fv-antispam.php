@@ -30,6 +30,7 @@ class FV_Antispam extends FV_Antispam_Plugin {
   var $basename;
   var $protect;
   var $locale;  
+  var $func__protect;
   
   public function __construct() {
     $this->basename = plugin_basename(__FILE__);

@@ -1,4 +1,20 @@
 <?php
+/*  Foliopress base class - a set of useful functions for FV plugins   
+    Copyright (C) 2013  Foliovision
+
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+*/ 
 
 /**
  * Foliopress base class
@@ -13,6 +29,9 @@ class FV_Antispam_Plugin
 	 * Stores the path to readme.txt available on trac, needs to be set from plugin
 	 * @var string
 	 */  
+
+  var $class_name;
+
   var $readme_URL;
 
 	/**
@@ -21,11 +40,44 @@ class FV_Antispam_Plugin
 	 */   
   var $update_prefix;
   
+  /**
+   * Stores plugin slug for various uses
+   * @var string
+   */
+  var $plugin_slug;
+
+  var $pointer_boxes;
+  
+  
   function __construct(){
   	$this->class_name = sanitize_title( get_class($this) );
   	add_action( 'admin_enqueue_scripts', array( $this, 'pointers_enqueue' ) );
   	add_action( 'wp_ajax_fv_foliopress_ajax_pointers', array( $this, 'pointers_ajax' ), 999 );
+  	add_action( 'admin_notices', array( $this, 'admin_notices' ) );
   }
+  
+  
+  function admin_notices() {
+    if( $notices = get_option($this->plugin_slug.'_deferred_notices') ) {
+      echo '<div class="updated">
+       <p>'.$notices.'</p>
+    </div>';  
+      delete_option($this->plugin_slug.'_deferred_notices');
+    }
+  
+    if( $notices = get_option($this->plugin_slug.'_deferred_errors') ) {
+      echo '<div class="error">
+       <p>'.$notices.'</p>
+    </div>';  
+      delete_option($this->plugin_slug.'_deferred_errors');
+    }
+  }	
+  
+  
+	function get_admin_page_url() {
+	  return get_admin_url().'options-general.php?page='.$this->plugin_slug;
+	}  
+  
   
   function http_request($method, $url, $data = '', $auth = '', $check_status = true)
   {
@@ -151,8 +203,7 @@ class FV_Antispam_Plugin
             //if (preg_match('~==\s*Changelog\s*==\s*=\s*[0-9.]+\s*=(.*)(=\s*[0-9.]+\s*=|$)~Uis', $data, $matches)) {
             if (preg_match('~==\s*Upgrade Notice\s*==\s*=\s*[0-9.]+\s*=(.*)(=\s*[0-9.]+\s*=|$)~Uis', $data, $matches)) {
                 $changelog = (array) preg_split('~[\r\n]+~', trim($matches[1]));
-
-                echo '<div style="color: #b51212;"">';
+                
                 $ul = false;
                 
                 foreach ($changelog as $index => $line) {
@@ -169,7 +220,7 @@ class FV_Antispam_Plugin
                             $ul = false;
                         }
                         $line = preg_replace('~^\s*\*\s*~', '', htmlspecialchars($line));
-                        echo '<p style="margin: 5px 0;">' . htmlspecialchars($line) . '</p>';
+                        echo '<br /><br />' . htmlspecialchars($line) . "\n";
                     }
                 }
                 
@@ -177,7 +228,6 @@ class FV_Antispam_Plugin
                     //echo '</ul><div style="clear: left;"></div>';
                 }
                 
-                echo '</div>';
             }
         }
       }
@@ -283,6 +333,9 @@ class FV_Antispam_Plugin
 			$position = ( isset($aPopup['position']) ) ? $aPopup['position'] : array( 'edge' => 'top', 'align' => 'center' );
 			
 			$opt_arr = array(	'content'  => $content, 'position' => $position );
+      
+      if( isset($aPopup['pointerClass']) ) $opt_arr['pointerClass'] = $aPopup['pointerClass'];
+      if( isset($aPopup['pointerWidth']) ) $opt_arr['pointerWidth'] = $aPopup['pointerWidth'];
 				
 			$function2 = $this->class_name.'_store_answer("'.$sKey.'", "false","' . $sNonce . '")';
 			$function1 = $this->class_name.'_store_answer("'.$sKey.'", "true","' . $sNonce . '")';
@@ -298,7 +351,7 @@ class FV_Antispam_Plugin
 				_ajax_nonce   : nonce
 			}
 			jQuery.post(ajaxurl, post_data, function () {
-				jQuery('#wp-pointer-0').remove();	//	todo: does this really work?
+				jQuery('.'+key).remove();	
 			});
 		}
 	//]]>
@@ -331,11 +384,16 @@ class FV_Antispam_Plugin
 				});
 
 				<?php echo $id; ?>_setup = function () {
-					$('<?php echo $selector; ?>').pointer(<?php echo $id; ?>_pointer_options).pointer('open');
+          var sSelector = '<?php echo $selector; ?>';
+          if( $(sSelector).length == 0 ){
+            sSelector = '#wpadminbar';
+          }
+          $(sSelector).append('<div class="<?php echo $id; ?>"></div>');
+					$(sSelector+' .<?php echo $id; ?>').pointer(<?php echo $id; ?>_pointer_options).pointer('open');
 					<?php if ( $button2 ) { ?>
-					jQuery('#pointer-close').after('<a id="pointer-primary" class="button-primary">' + '<?php echo addslashes($button2); ?>' + '</a>');
-					jQuery('#pointer-primary').click(function () { <?php echo $button1_function; ?> });
-					jQuery('#pointer-close').click(function () { <?php echo $button2_function; ?>	});
+					jQuery('.<?php echo $id; ?> #pointer-close').after('<a id="pointer-primary" class="button-primary">' + '<?php echo addslashes($button2); ?>' + '</a>');
+					jQuery('.<?php echo $id; ?> #pointer-primary').click(function () { <?php echo $button1_function; ?> });
+					jQuery('.<?php echo $id; ?> #pointer-close').click(function () { <?php echo $button2_function; ?>	});
 					<?php } ?>
 				};
 
@@ -354,6 +412,150 @@ class FV_Antispam_Plugin
   function is_min_wp( $version ) {
     return version_compare( $GLOBALS['wp_version'], $version. 'alpha', '>=' );
   }
+  
+  
+  
+
+  //search for plugin path with {slug}.php
+  public static function get_plugin_path( $slug ){
+    $aPluginSlugs = get_transient('plugin_slugs');
+    $aPluginSlugs = is_array($aPluginSlugs) ? $aPluginSlugs : array( $slug.'/'.$slug.'.php');
+    $aActivePlugins = get_option('active_plugins');
+    $aInactivePlugins = array_diff($aPluginSlugs,$aActivePlugins);
+    
+    if( !$aPluginSlugs )
+      return false;
+      
+    foreach( $aActivePlugins as $item ){
+      if( stripos($item,$slug.'.php') !== false && !is_wp_error(validate_plugin($item)) )
+        return $item;
+    }
+    
+    $sPluginFolder = plugin_dir_path( dirname( dirname(__FILE__) ) );
+    foreach( $aInactivePlugins as $item ){
+      if( stripos($item,$slug.'.php') !== false && file_exists($sPluginFolder.$item) )
+        return $item;
+    }  
+    
+    return false;
+  }
+  
+  
+  
+  
+  public static function install_form_text( $html, $name ) {
+    $tag = stripos($html,'</h3>') !== false ? 'h3' : 'h2';
+    $html = preg_replace( '~<'.$tag.'.*?</'.$tag.'>~', '<'.$tag.'>'.$name.' auto-installation</'.$tag.'>', $html );
+    $html = preg_replace( '~(<input[^>]*?type="submit"[^>]*?>)~', '$1 <a href="'.admin_url('options-general.php?page=fvplayer').'">Skip the '.$name.' install</a>', $html );    
+    return $html;
+  }
+  
+  
+  
+  
+  public static function install_plugin( $name, $plugin_package, $plugin_basename, $download_url, $settings_url, $option, $nonce ) {  //  'FV Player Pro', 'fv-player-pro', '/wp-admin/options-general.php?page=fvplayer', download URL (perhaps from the license), settings URL (use admin_url(...), should also contain some GET which will make it install the extension if present) and option where result message should be stored and a nonce which should be passed
+    global $hook_suffix;
+    
+    $plugin_path = self::get_plugin_path( str_replace( '_', '-', $plugin_package ) );
+    if( !defined('PHPUnitTestMode') && $plugin_path ) {
+      $result = activate_plugin( $plugin_path, $settings_url );
+      if ( is_wp_error( $result ) ) {
+        update_option( $option, $name.' extension activation error: '.$result->get_error_message() );
+        return false;
+      } else {
+        update_option( $option, $name.' extension activated' );
+        return true; //  already installed
+      }
+    }
+
+    $plugin_basename = $plugin_path ? $plugin_path : $plugin_basename;
+
+    $url = wp_nonce_url( $settings_url, $nonce, 'nonce_'.$nonce );
+
+    set_current_screen();
+
+    ob_start();
+    if ( false === ( $creds = request_filesystem_credentials( $url, '', false, false, false ) ) ) {
+      $form = ob_get_clean();
+      include( ABSPATH . 'wp-admin/admin-header.php' );
+      echo self::install_form_text($form, $name);
+      include( ABSPATH . 'wp-admin/admin-footer.php' );
+      die;
+    }	
+
+    if ( ! WP_Filesystem( $creds ) ) {
+      ob_start();
+      request_filesystem_credentials( $url, $method, true, false, false );
+      $form = ob_get_clean();
+      include( ABSPATH . 'wp-admin/admin-header.php' );
+      echo self::install_form_text($form, $name);
+      include( ABSPATH . 'wp-admin/admin-footer.php' );
+      die;
+    }
+
+    require_once ABSPATH . 'wp-admin/includes/class-wp-upgrader.php';
+    
+    $result = true;
+       
+    if( !$plugin_path || is_wp_error(validate_plugin($plugin_basename)) ) {
+      $sTaskDone = $name.__(' extension installed successfully!', 'fv-wordpress-flowplayer');
+      
+      echo '<div style="display: none;">';
+      $objInstaller = new Plugin_Upgrader();
+      $objInstaller->install( $download_url );
+      echo '</div>';
+      wp_cache_flush();
+      
+      if ( is_wp_error( $objInstaller->skin->result ) ) {
+        update_option( $option, $name.__(' extension install failed - ', 'fv-wordpress-flowplayer') . $objInstaller->skin->result->get_error_message() );
+        $result = false;
+      } else {    
+        if ( $objInstaller->plugin_info() ) {
+          $plugin_basename = $objInstaller->plugin_info();
+        }
+        
+        $activate = activate_plugin( $plugin_basename );
+        if ( is_wp_error( $activate ) ) {
+          update_option( $option, $name.__(' extension install failed - ', 'fv-wordpress-flowplayer') . $activate->get_error_message());
+          $result = false;
+        }
+      }
+      
+    } else if( $plugin_path ) {
+      $sTaskDone = $name.__(' extension upgraded successfully!', 'fv-wordpress-flowplayer');
+
+      echo '<div style="display: none;">';
+      $objInstaller = new Plugin_Upgrader();
+      $objInstaller->upgrade( $plugin_path );    
+      echo '</div></div>';  //  explanation: extra closing tag just to be safe (in case of "The plugin is at the latest version.")
+      wp_cache_flush();
+      
+      if ( is_wp_error( $objInstaller->skin->result ) ) {
+        update_option( $option, $name.' extension upgrade failed - '.$objInstaller->skin->result->get_error_message() );
+        $result = false;
+      } else {    
+        if ( $objInstaller->plugin_info() ) {
+          $plugin_basename = $objInstaller->plugin_info();
+        }
+        
+        $activate = activate_plugin( $plugin_basename );
+        if ( is_wp_error( $activate ) ) {
+          update_option( $option, $name.' Pro extension upgrade failed - '.$activate->get_error_message() );
+          $result = false;
+        }
+      }    
+      
+    }
+
+    if( $result ) {
+      update_option( $option, $sTaskDone );
+      echo "<script>location.href='".$settings_url."';</script>";
+    }
+
+    return $result;
+  }
+  
+    
 
 }
 
