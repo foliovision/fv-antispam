@@ -192,7 +192,7 @@ class FV_Antispam extends FV_Antispam_Plugin {
   
       $count_types = array();
       foreach( $count AS $count_item ) {
-        if( $count_item->comment_type == '' ) $count_types[$count_item->comment_approved]['comments'] = $count_item->num_comments;
+        if( $count_item->comment_type == '' || $count_item->comment_type == 'comment' ) $count_types[$count_item->comment_approved]['comments'] = $count_item->num_comments;
         else $count_types[$count_item->comment_approved]['pings'] += $count_item->num_comments;
       }
 
