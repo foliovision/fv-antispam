@@ -1637,7 +1637,7 @@ function fvacq( form_name, form_id ) {
   
   
   function func__registration_errors( $errors ) {
-  	$message = ( trim($this->func__get_plugin_option('protect_filledin_notice')) ) ? $this->func__get_plugin_option('protect_filledin_notice') : 'Your form submission was detected as spam. Please contact us directly.';
+  	$message = ( $this->func__get_plugin_option('protect_filledin_notice') && trim($this->func__get_plugin_option('protect_filledin_notice')) ) ? $this->func__get_plugin_option('protect_filledin_notice') : 'Your form submission was detected as spam. Please contact us directly.';
   	$errors->add( 'fv_antispam', $message );
   	return $errors;
   }
