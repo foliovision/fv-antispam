@@ -2,7 +2,7 @@
 Contributors: FolioVision
 Tags: antispam, spam, akismet
 Requires at least: 3.5
-Tested up to: 6.1
+Tested up to: 6.3
 Stable tag: trunk
 
 FV Antispam is a powerful and simple antispam plugin. It moves any spambot comments directly to trash and allows Akismet to just deal with human spam.
@@ -178,3 +178,19 @@ Please check your template HTML and CSS for that element. Ideally it should use 
 = All the comments go into trash! =
 
 Same as above - make sure you use standard WP functions for display of comment forms. When you check out HTML source of your article page with comments bellow it, you should see two textareas - one with ID comment and the other with ID consisting of random numbers and letters. The first one should be set to invisible by this plugin.
+
+== Testing ==
+
+1. Go to Settings -> FV Antispam
+
+1.1. Basic settings should be checked by default.
+
+2. Create post with enabled comments
+
+2.1. Make comment as non-logged in user
+
+2.2. Comment will be set as pending
+
+2.3. Make comment to hidden field
+
+2.4. Comment will be moved to trash
