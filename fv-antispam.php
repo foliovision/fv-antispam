@@ -235,8 +235,10 @@ class FV_Antispam extends FV_Antispam_Plugin {
 
       $table_exists = $wpdb->get_var( "SHOW TABLES WHERE `Tables_in_{$wpdb->dbname}` = '{$wpdb->prefix}filled_in_forms'" );
 
+      $forms =  false;
+
       if( $table_exists ) {
-      	$forms = $wpdb->get_col( "SELECT name FROM {$wpdb->prefix}filled_in_forms" );
+        $forms = $wpdb->get_col( "SELECT name FROM {$wpdb->prefix}filled_in_forms" );
       }
       
       if( $forms ) {
