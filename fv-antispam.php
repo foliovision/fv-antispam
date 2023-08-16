@@ -1807,7 +1807,7 @@ function fvacq( form_name, form_id ) {
     $res = false;
     $res2 = false;
     if( $this->func__get_plugin_option('trash_banned') ) {
-      $res = wp_blacklist_check($commentdata->comment_author, $commentdata->comment_author_email, $commentdata->comment_author_url, $commentdata->comment_content, $commentdata->comment_author_IP, $commentdata->comment_agent);
+      $res = wp_check_comment_disallowed_list($commentdata->comment_author, $commentdata->comment_author_email, $commentdata->comment_author_url, $commentdata->comment_content, $commentdata->comment_author_IP, $commentdata->comment_agent);
     }
     if( $spam_remove ) {
       $res2 = isset($_POST['bee_spam']) ? $_POST['bee_spam'] : false;
