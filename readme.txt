@@ -194,3 +194,11 @@ Same as above - make sure you use standard WP functions for display of comment f
 2.3. Make comment to hidden field
 
 2.4. Comment will be moved to trash
+
+3. Logout & go to register page
+
+3.1. Disable javascript in your browser & reload page
+
+3.2. You should see the security question
+
+3.3. Adding wrong answer will result in error message
