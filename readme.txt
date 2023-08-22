@@ -178,27 +178,3 @@ Please check your template HTML and CSS for that element. Ideally it should use 
 = All the comments go into trash! =
 
 Same as above - make sure you use standard WP functions for display of comment forms. When you check out HTML source of your article page with comments bellow it, you should see two textareas - one with ID comment and the other with ID consisting of random numbers and letters. The first one should be set to invisible by this plugin.
-
-== Testing ==
-
-1. Go to Settings -> FV Antispam
-
-1.1. Basic settings should be checked by default.
-
-2. Create post with enabled comments
-
-2.1. Make comment as non-logged in user
-
-2.2. Comment will be set as pending
-
-2.3. Make comment to hidden field
-
-2.4. Comment will be moved to trash
-
-3. Logout & go to register page
-
-3.1. Disable javascript in your browser & reload page
-
-3.2. You should see the security question
-
-3.3. Adding wrong answer will result in error message
