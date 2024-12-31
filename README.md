@@ -19,10 +19,14 @@ Powerful and simple antispam plugin. Puts all the spambot comments directly into
 
   4. Comment will be moved to trash
 
-* Logout & go to register page
+* Test "Protect the registration form" setting
 
-  1. Disable javascript in your browser & reload page
+  1 Enable wp-admin -> Settings -> General - > Membership	(Anyone can register)
 
-  2. You should see the security question
+  2. Logout & go to register page
 
-  3. Adding wrong answer will result in error message
+  3. Disable javascript in your browser & reload page
+
+  4. You should see the security question
+
+  5. Adding wrong answer will result in error message
