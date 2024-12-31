@@ -1,6 +1,6 @@
 <div class="wrap">
   <div style="position: absolute; right: 20px; margin-top: 5px">
-    <a href="http://foliovision.com/wordpress/plugins/fv-antispam" target="_blank" title="Documentation"><img alt="visit foliovision" src="http://foliovision.com/shared/fv-logo.png" /></a>
+    <a href="http://foliovision.com/wordpress/plugins/fv-antispam" target="_blank" title="Documentation"><img alt="visit foliovision" src="<?php echo esc_attr( plugins_url( 'view/fv-logo.png', __FILE__ ) ); ?>" /></a>
   </div>
 
   <?php if ($this->util__is_min_wp('2.7')) { ?>
