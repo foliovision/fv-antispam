@@ -550,6 +550,11 @@ class FV_Antispam extends FV_Antispam_Plugin {
     } else {     
       $date = date('Y-m-d H:i:s' ,mktime(0, 0, 0, date("m")-1, date("d"), date("Y")));
     }
+
+    if ( ! $date ) {
+      return;
+    }
+
     $comments = $wpdb->get_results("SELECT * FROM $wpdb->comments WHERE comment_id NOT IN ( select comment_id from $wpdb->commentmeta where meta_key = '_wp_trash_meta_time' ) AND comment_date_gmt < '$date' AND comment_approved = 'trash' ORDER BY comment_date_gmt ASC LIMIT 5000");
     if( count($comments) ) {      
       $comments_imploded = '';
