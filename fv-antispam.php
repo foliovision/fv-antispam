@@ -1784,10 +1784,19 @@ function fvacq( form_name, form_id ) {
   	if( isset($_POST['m_'.$protect]) && isset($_POST['ma_'.$protect]) && $_POST['m_'.$protect] == $_POST['ma_'.$protect] ) {
     	$_POST['user_email'] = ( $_POST['user_email'] ) ? $_POST['user_email'] : $_POST[$this->func__ip_protect()];
   	} else if( isset($_POST['user_email']) && trim($_POST['user_email']) != "" ) {
-      $fv_antispam_registrations = get_option('fv_antispam_registrations');
-      $fv_antispam_registrations = ( $fv_antispam_registrations ) ? $fv_antispam_registrations : array();      
+      $fv_antispam_registrations = get_option('fv_antispam_registrations', array() );
+
+      // Go through $fv_antispam_registrations and remove items older than 1 year
+      $keep_recent_only = array();
+      foreach( $fv_antispam_registrations as $line ) {
+        if ( strtotime( $line['date'] ) > strtotime( '-1 year' ) ) {
+          $keep_recent_only[] = $line;
+        }
+      }
+      $fv_antispam_registrations = $keep_recent_only;
+
       $fv_antispam_registrations[] = array( 'date' => date('r'), 'user_login' => $_POST['user_login'], 'user_email' => $_POST['user_email'] );
-      update_option( 'fv_antispam_registrations', $fv_antispam_registrations );
+      update_option( 'fv_antispam_registrations', $fv_antispam_registrations, false );
       unset($_POST['user_email']);
       
       add_filter( 'registration_errors', array( $this, 'func__registration_errors' ) );
