@@ -1665,16 +1665,21 @@ function fvacq( form_name, form_id ) {
     $sForm = $aMatch[0];
     $sTextarea = $aMatch[1];
   
-    preg_match( '/class=[\"\'](.*?)[\"\']/', $sTextarea, $class );
+    preg_match( '/class=["\'](.*?)["\']/', $sTextarea, $class );
     preg_match( '/id=[\"\'](.*?)[\"\']/', $sTextarea, $id );
     preg_match( '/name=[\"\'](.*?)[\"\']/', $sTextarea, $name );
+    preg_match( '/\s*?required=["\'](.*?)["\']/', $sTextarea, $required );
 
     $sClass = !empty($class) ? $class[1] : false;
     $sID = $id[1];
     $sName = $name[1];
+    $sRequired = !empty( $required ) ? $required[0] : false;
 
     $sTextarea = preg_replace('~<textarea([^\>]*>).*?</textarea>~', "<textarea$1</textarea>", $sTextarea ); // have to keep the hidden textarea empty
-        
+
+    // Remove the required attribute from the textarea
+    $sTextarea = str_replace( $sRequired, '', $sTextarea );
+
     $sProtect = FV_Antispam::func__protect($post->ID);
     
     $sTextareaNew = preg_replace( '/id=[\'"]'.$sID.'[\'"]/i', 'id="'.$sProtect.'"', $sTextarea );
