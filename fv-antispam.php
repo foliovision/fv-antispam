@@ -1046,12 +1046,13 @@ function fvacq( form_name, form_id ) {
   
   
   function disp__login_form_js() {
+    $key   = $this->func__ip_protect();
     $value = !empty($_POST[$this->func__ip_protect()]) ? $_POST[$this->func__ip_protect()] : '';
     ?>
 <script type="text/javascript">    
   jQuery(document).ready(function() {
 		jQuery( '#user_email').after(
-			jQuery("#user_email").clone().attr('id', '<?php echo $this->func__ip_protect(); ?>').attr('name', '<?php echo $this->func__ip_protect(); ?>').attr('value', '<?php echo $value; ?>')
+			jQuery("#user_email").clone().attr('id', '<?php echo esc_js( $key ); ?>').attr('name', '<?php echo esc_js( $key ); ?>').attr('value', '<?php echo esc_attr( $value ); ?>')
 		);
     jQuery("#user_email").hide();    
   })      
