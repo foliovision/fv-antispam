@@ -1693,7 +1693,7 @@ function fvacq( form_name, form_id ) {
 			$sTextareaNew .= FV_Antispam::disp__math_question($sProtect);
     }
     
-    $sTextarea = str_replace( array('required="required"',"required='required'"), array('',''), $sTextarea ); // HTML5 form validation needs to be disabled
+    $sTextarea = str_replace( array( 'required="required"', "required='required'", 'required' ), '', $sTextarea ); // HTML5 form validation needs to be disabled
     
     $sForm = preg_replace('~<textarea([^\>]*name=[\'\"]comment[\'\"][^\>]*>).*?</textarea>~', $sTextarea, $sForm ); // put in the adjusted textarea
     $sForm = preg_replace('~(class=[\'"][^\'"]*?)required([^\'"]*?[\'"])~', "$1$2", $sForm);   // gotta get rid of class="required"
