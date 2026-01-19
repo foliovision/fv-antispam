@@ -547,6 +547,12 @@ class FV_Antispam extends FV_Antispam_Plugin {
       
     if( 1 ) { //  todo: option
       $date = $wpdb->get_var( "SELECT comment_date_gmt FROM $wpdb->comments WHERE comment_approved = 'trash' ORDER BY comment_date_gmt DESC LIMIT 20000,1" );
+
+      // Not enough comments to clean up.
+      if ( ! $date ) {
+        return;
+      }
+
     } else {     
       $date = date('Y-m-d H:i:s' ,mktime(0, 0, 0, date("m")-1, date("d"), date("Y")));
     }
@@ -2149,3 +2155,4 @@ if ( !function_exists('wp_notify_moderator') && ( $GLOBALS['FV_Antispam']->func_
   endif;
 
 endif;
+
